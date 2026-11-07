@@ -23,10 +23,20 @@
 ## 🌟 Highlights & Features
 
 - **Distraction-Free Writing**: Inspired by Bear, iA Writer, and Obsidian. A clean, typography-focused interface without cluttered toolbars.
-- **Markdown with Live Preview**:
-  - **Split View**: Simultaneous editing and live rendering on desktop/laptop.
-  - **Reading Mode**: Clean, presentation-grade viewing for reference and docs.
-  - **Focus Mode**: Fullscreen editor optimized for smartphones and smaller screens.
+- **Multi-User & Role Management**:
+  - The first registered user is automatically assigned the **Administrator** role.
+  - Support for multiple user accounts with registration.
+- **Folders & Organization**:
+  - Organize notes into custom folders or keep them uncategorized.
+  - Quick folder filter navigation in the sidebar with live note counters.
+- **Sharing & Collaboration**:
+  - **Share with Users**: Share notes or entire folders with other registered users with granular permissions (*Can View* or *Can Edit*).
+  - **Public Link Sharing**: Generate read-only shareable links (`/shared/<token>`) accessible to anyone without requiring an account.
+  - **Shared with Me**: Dedicated sidebar view displaying all notes and folders shared with you.
+- **Markdown with Live Preview & View Modes (Desktop & Mobile)**:
+  - **Write Mode**: Full-width, distraction-free writing environment.
+  - **Split View**: Side-by-side live editor and rendered markdown preview on desktop/laptop.
+  - **Preview Mode**: Clean, presentation-grade viewing for reference and reading.
 - **Seamless Image Management**:
   - **Clipboard Paste (`Ctrl + V`)**: Paste screenshots directly from your clipboard into the editor.
   - **Drag & Drop**: Drag image files straight onto the page.

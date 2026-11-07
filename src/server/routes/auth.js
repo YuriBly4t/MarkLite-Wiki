@@ -1,10 +1,11 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const db = require('../db');
+const requireAuth = require('../middleware/auth');
 
 const router = express.Router();
 
-// Status check: whether setup is required and whether user is authenticated
+// Status check: whether setup is required, whether authenticated, and user info
 router.get('/status', (req, res) => {
   const needsSetup = !db.hasUsers();
   let user = null;
@@ -16,14 +17,14 @@ router.get('/status', (req, res) => {
   res.json({
     needsSetup,
     isAuthenticated: !!user,
-    user: user ? { id: user.id, username: user.username } : null
+    user: user ? { id: user.id, username: user.username, role: user.role } : null
   });
 });
 
-// First-run setup: only available when no users exist
+// Setup-Wizard (First user creation)
 router.post('/setup', (req, res) => {
   if (db.hasUsers()) {
-    return res.status(403).json({ error: 'Setup has already been completed. Please sign in.' });
+    return res.status(403).json({ error: 'Setup has already been completed. Please sign in or register.' });
   }
 
   const { username, password } = req.body;
@@ -39,19 +40,54 @@ router.post('/setup', (req, res) => {
   try {
     const saltRounds = 10;
     const passwordHash = bcrypt.hashSync(password, saltRounds);
-    const user = db.createUser(username, passwordHash);
+    const user = db.createUser(username, passwordHash); // Automatically set to role 'admin'
 
-    // Sign in immediately after setup
     req.session.userId = user.id;
 
     res.status(201).json({
       success: true,
       message: 'Administrator account created successfully!',
-      user: { id: user.id, username: user.username }
+      user: { id: user.id, username: user.username, role: user.role }
     });
   } catch (err) {
     console.error('Setup error:', err);
     res.status(500).json({ error: 'Failed to create administrator account.' });
+  }
+});
+
+// User Registration (Multi-User)
+router.post('/register', (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || username.trim().length < 3) {
+    return res.status(400).json({ error: 'Username must be at least 3 characters long.' });
+  }
+
+  if (!password || password.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters long.' });
+  }
+
+  const existing = db.getUserByUsername(username);
+  if (existing) {
+    return res.status(409).json({ error: 'A user with this username already exists.' });
+  }
+
+  try {
+    const saltRounds = 10;
+    const passwordHash = bcrypt.hashSync(password, saltRounds);
+    const user = db.createUser(username, passwordHash);
+
+    // Auto-login upon registration
+    req.session.userId = user.id;
+
+    res.status(201).json({
+      success: true,
+      message: user.role === 'admin' ? 'Admin account created!' : 'Account created successfully!',
+      user: { id: user.id, username: user.username, role: user.role }
+    });
+  } catch (err) {
+    console.error('Registration error:', err);
+    res.status(500).json({ error: 'Failed to register account.' });
   }
 });
 
@@ -77,7 +113,7 @@ router.post('/login', (req, res) => {
 
   res.json({
     success: true,
-    user: { id: user.id, username: user.username }
+    user: { id: user.id, username: user.username, role: user.role }
   });
 });
 
@@ -99,7 +135,18 @@ router.get('/me', (req, res) => {
     return res.status(401).json({ error: 'User account no longer exists.' });
   }
 
-  res.json({ user: { id: user.id, username: user.username } });
+  res.json({ user: { id: user.id, username: user.username, role: user.role } });
+});
+
+// List other registered users (for sharing dialog)
+router.get('/users', requireAuth, (req, res) => {
+  try {
+    const users = db.getAllUsers(req.session.userId);
+    res.json(users.map(u => ({ id: u.id, username: u.username, role: u.role })));
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    res.status(500).json({ error: 'Failed to fetch users list.' });
+  }
 });
 
 module.exports = router;

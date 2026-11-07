@@ -4,14 +4,13 @@ const requireAuth = require('../middleware/auth');
 
 const router = express.Router();
 
-// All notes endpoints require authentication
 router.use(requireAuth);
 
-// List all notes (optional search and tag filtering)
+// List notes with search, tag, folder, and shared filters
 router.get('/', (req, res) => {
   try {
-    const { search, tag } = req.query;
-    const notes = db.getNotes(req.session.userId, { search, tag });
+    const { search, tag, folderId, filter } = req.query;
+    const notes = db.getNotes(req.session.userId, { search, tag, folderId, filter });
     res.json(notes);
   } catch (err) {
     console.error('Error loading notes:', err);
@@ -36,7 +35,7 @@ router.get('/:id', (req, res) => {
     const noteId = parseInt(req.params.id, 10);
     const note = db.getNoteById(noteId, req.session.userId);
     if (!note) {
-      return res.status(404).json({ error: 'Note not found.' });
+      return res.status(404).json({ error: 'Note not found or access denied.' });
     }
     res.json(note);
   } catch (err) {
@@ -48,12 +47,13 @@ router.get('/:id', (req, res) => {
 // Create new note
 router.post('/', (req, res) => {
   try {
-    const { title, content, isPinned, tags } = req.body;
+    const { title, content, isPinned, tags, folderId } = req.body;
     const note = db.createNote(req.session.userId, {
       title,
       content,
       isPinned,
-      tags
+      tags,
+      folderId
     });
     res.status(201).json(note);
   } catch (err) {
@@ -62,21 +62,22 @@ router.post('/', (req, res) => {
   }
 });
 
-// Update note
+// Update note (allowed for owner or editor)
 router.put('/:id', (req, res) => {
   try {
     const noteId = parseInt(req.params.id, 10);
-    const { title, content, isPinned, tags } = req.body;
+    const { title, content, isPinned, tags, folderId } = req.body;
 
     const updated = db.updateNote(noteId, req.session.userId, {
       title,
       content,
       isPinned,
-      tags
+      tags,
+      folderId
     });
 
     if (!updated) {
-      return res.status(404).json({ error: 'Note not found or unauthorized.' });
+      return res.status(403).json({ error: 'Note not found or you have view-only access.' });
     }
 
     res.json(updated);
@@ -86,14 +87,14 @@ router.put('/:id', (req, res) => {
   }
 });
 
-// Delete note
+// Delete note (owner only)
 router.delete('/:id', (req, res) => {
   try {
     const noteId = parseInt(req.params.id, 10);
     const success = db.deleteNote(noteId, req.session.userId);
 
     if (!success) {
-      return res.status(404).json({ error: 'Note not found.' });
+      return res.status(403).json({ error: 'Note not found or you are not the owner.' });
     }
 
     res.json({ success: true, message: 'Note deleted successfully.' });

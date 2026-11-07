@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account • MarkLite Wiki</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2'><path d='M12 20h9'/><path d='M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z'/></svg>">
+</head>
+<body class="auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="8.5" cy="7" r="4"/>
+          <line x1="20" y1="8" x2="20" y2="14"/>
+          <line x1="23" y1="11" x2="17" y2="11"/>
+        </svg>
+      </div>
+      <h2>Create Account</h2>
+      <p class="auth-sub">Register to create and collaborate on notes.</p>
+    </div>
+
+    <div id="alertBox" class="alert hidden"></div>
+
+    <form id="registerForm" class="auth-form">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Choose a username" required autofocus autocomplete="username">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password (min. 6 characters)</label>
+        <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="new-password">
+      </div>
+
+      <div class="form-group">
+        <label for="passwordConfirm">Confirm Password</label>
+        <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="••••••••" required autocomplete="new-password">
+      </div>
+
+      <button type="submit" id="submitBtn" class="btn btn-primary btn-block">
+        Sign Up
+      </button>
+
+      <div style="text-align: center; margin-top: 1.25rem; font-size: 0.9rem;">
+        <span style="color: var(--text-muted);">Already have an account?</span> 
+        <a href="/login" style="color: var(--accent); text-decoration: none; font-weight: 600;">Sign In</a>
+      </div>
+    </form>
+    
+    <div class="auth-footer">
+      <span>🔒 Self-hosted Markdown Wiki</span><br>
+      <span style="font-size: 0.72rem; opacity: 0.7;">⚠️ 100% AI-generated code (not manually audited)</span>
+    </div>
+  </div>
+
+  <script>
+    // Check if initial setup is still required
+    fetch('/api/auth/status')
+      .then(r => r.json())
+      .then(data => {
+        if (data.needsSetup) {
+          window.location.href = '/setup';
+        } else if (data.isAuthenticated) {
+          window.location.href = '/';
+        }
+      })
+      .catch(() => {});
+
+    const form = document.getElementById('registerForm');
+    const alertBox = document.getElementById('alertBox');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function showAlert(msg, isError = true) {
+      alertBox.textContent = msg;
+      alertBox.className = 'alert ' + (isError ? 'alert-error' : 'alert-success');
+      alertBox.classList.remove('hidden');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alertBox.classList.add('hidden');
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const confirm = document.getElementById('passwordConfirm').value;
+
+      if (username.length < 3) {
+        showAlert('Username must be at least 3 characters long.');
+        return;
+      }
+
+      if (password.length < 6) {
+        showAlert('Password must be at least 6 characters long.');
+        return;
+      }
+
+      if (password !== confirm) {
+        showAlert('Passwords do not match.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating account...';
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Registration failed');
+        }
+
+        showAlert('Account created! Redirecting...', false);
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 800);
+
+      } catch (err) {
+        showAlert(err.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign Up';
+      }
+    });
+  </script>
+</body>
+</html>

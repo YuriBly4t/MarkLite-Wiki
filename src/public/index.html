@@ -38,6 +38,45 @@
         </div>
       </div>
 
+      <!-- Folders Section -->
+      <div class="folders-section">
+        <div class="section-header">
+          <span>Folders</span>
+          <button id="addFolderBtn" class="btn btn-ghost btn-icon btn-sm" title="New Folder" style="padding: 0.15rem 0.35rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Built-in Folders / Filters -->
+        <div id="folderAll" class="folder-item active" data-filter="all">
+          <div class="folder-name-wrap">
+            <span>📝</span>
+            <span>All Notes</span>
+          </div>
+          <span id="allNotesCount" class="folder-badge">0</span>
+        </div>
+
+        <div id="folderUncategorized" class="folder-item" data-filter="uncategorized">
+          <div class="folder-name-wrap">
+            <span>📂</span>
+            <span>Uncategorized</span>
+          </div>
+        </div>
+
+        <div id="folderShared" class="folder-item" data-filter="shared">
+          <div class="folder-name-wrap">
+            <span>👥</span>
+            <span>Shared with Me</span>
+          </div>
+        </div>
+
+        <!-- Dynamic User Folders -->
+        <div id="userFoldersList"></div>
+      </div>
+
       <!-- Notes list -->
       <div id="notesListContainer" class="sidebar-notes-list">
         <!-- Notes rendered dynamically -->
@@ -51,6 +90,7 @@
             <circle cx="12" cy="7" r="4"/>
           </svg>
           <span id="userNameDisplay">User</span>
+          <span id="userRoleBadge" style="font-size: 0.68rem; padding: 0.1rem 0.35rem; border-radius: 4px; background: var(--accent-light); color: var(--accent); font-weight: 700;">USER</span>
         </div>
         <div style="display: flex; gap: 0.25rem;">
           <button id="themeToggleBtn" class="btn btn-ghost btn-icon" title="Toggle Theme">
@@ -86,6 +126,17 @@
               <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
             <span>New Note</span>
+          </button>
+
+          <button id="shareNoteBtn" class="btn btn-secondary btn-sm" title="Share Note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            <span>Share</span>
           </button>
 
           <button id="pinNoteBtn" class="btn btn-ghost btn-icon btn-sm" title="Pin note">
@@ -128,12 +179,18 @@
         <button class="toolbar-btn" data-format="link" title="Insert Link">🔗 Link</button>
         <div class="toolbar-divider"></div>
         <button class="toolbar-btn" data-format="image" title="Upload & Insert Image">🖼️ Image</button>
-        <!-- Hidden input for file selection -->
         <input type="file" id="imageFileInput" accept="image/*" style="display: none;">
       </div>
 
-      <!-- Note Header: Title & Tags -->
+      <!-- Note Header: Folder, Title & Tags -->
       <div class="note-header-inputs">
+        <div class="note-folder-select-wrap">
+          <span>📁 Folder:</span>
+          <select id="noteFolderSelect" class="note-folder-select">
+            <option value="">None (Uncategorized)</option>
+          </select>
+          <span id="sharedInfoBadge" class="hidden" style="font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: var(--bg-tertiary); color: var(--accent);"></span>
+        </div>
         <input type="text" id="noteTitleInput" class="note-title-input" placeholder="Note title...">
         <input type="text" id="noteTagsInput" class="note-tags-input" placeholder="Tags with # (e.g. #work #ideas #linux)">
       </div>
@@ -173,6 +230,80 @@
         <span id="wordCount">0 words</span>
       </div>
     </main>
+  </div>
+
+  <!-- Share Modal Dialog -->
+  <div id="shareModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="shareModalTitle">Share Note</h3>
+        <button id="closeShareModalBtn" class="btn btn-ghost btn-icon">✕</button>
+      </div>
+
+      <div class="modal-tabs" style="padding: 0 1.5rem; margin-top: 0.5rem;">
+        <button id="tabUsersBtn" class="modal-tab-btn active">Share with Users</button>
+        <button id="tabPublicBtn" class="modal-tab-btn">Public Link</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Tab 1: Share with other users on this instance -->
+        <div id="tabUsersContent">
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+            <select id="shareUserSelect" style="flex: 2;">
+              <option value="">Select a user...</option>
+            </select>
+            <select id="sharePermissionSelect" style="flex: 1;">
+              <option value="view">Can view</option>
+              <option value="edit">Can edit</option>
+            </select>
+            <button id="addShareUserBtn" class="btn btn-primary btn-sm">Share</button>
+          </div>
+
+          <h4 style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem;">Users with access</h4>
+          <div id="activeSharesList" class="share-list">
+            <span style="color: var(--text-dim); font-size: 0.85rem;">Not shared with any users yet.</span>
+          </div>
+        </div>
+
+        <!-- Tab 2: Public link sharing -->
+        <div id="tabPublicContent" class="hidden">
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Anyone with this link will be able to view this content in read-only mode without logging in.
+          </p>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="publicShareUrlInput" readonly placeholder="Click Generate Link below">
+            <button id="copyPublicLinkBtn" class="btn btn-secondary btn-sm">Copy</button>
+          </div>
+          <button id="generatePublicLinkBtn" class="btn btn-primary btn-block" style="margin-top: 1rem;">
+            Generate Public Link
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="doneShareModalBtn" class="btn btn-secondary btn-sm">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Folder Modal -->
+  <div id="createFolderModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>New Folder</h3>
+        <button id="closeFolderModalBtn" class="btn btn-ghost btn-icon">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="newFolderNameInput">Folder Name</label>
+          <input type="text" id="newFolderNameInput" placeholder="e.g. Work, Linux, Projects" autofocus>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelFolderModalBtn" class="btn btn-ghost btn-sm">Cancel</button>
+        <button id="submitFolderModalBtn" class="btn btn-primary btn-sm">Create Folder</button>
+      </div>
+    </div>
   </div>
 
   <!-- Scripts -->

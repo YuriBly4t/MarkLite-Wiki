@@ -8,6 +8,8 @@ const fs = require('fs');
 const authRoutes = require('./routes/auth');
 const notesRoutes = require('./routes/notes');
 const uploadRoutes = require('./routes/upload');
+const folderRoutes = require('./routes/folders');
+const shareRoutes = require('./routes/shares');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -45,6 +47,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/notes', notesRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/uploads', uploadRoutes);
+app.use('/api/folders', folderRoutes);
+app.use('/api/shares', shareRoutes);
 
 // Static files
 const publicDir = path.resolve(__dirname, '../public');
@@ -55,8 +59,16 @@ app.get('/login', (req, res) => {
   res.sendFile(path.join(publicDir, 'login.html'));
 });
 
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(publicDir, 'register.html'));
+});
+
 app.get('/setup', (req, res) => {
   res.sendFile(path.join(publicDir, 'setup.html'));
+});
+
+app.get('/shared/:token', (req, res) => {
+  res.sendFile(path.join(publicDir, 'shared.html'));
 });
 
 // SPA fallback
