@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup • MarkLite Wiki</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2'><path d='M12 20h9'/><path d='M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z'/></svg>">
+</head>
+<body class="auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"/>
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+      </div>
+      <h2>Ersteinrichtung</h2>
+      <p class="auth-sub">Willkommen bei deinem persönlichen Markdown-Wiki. Erstelle jetzt dein Administrator-Konto.</p>
+    </div>
+
+    <div id="alertBox" class="alert hidden"></div>
+
+    <form id="setupForm" class="auth-form">
+      <div class="form-group">
+        <label for="username">Administrator-Benutzername</label>
+        <input type="text" id="username" name="username" placeholder="z. B. admin" required autofocus autocomplete="username">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Passwort (min. 6 Zeichen)</label>
+        <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="new-password">
+      </div>
+
+      <div class="form-group">
+        <label for="passwordConfirm">Passwort wiederholen</label>
+        <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="••••••••" required autocomplete="new-password">
+      </div>
+
+      <button type="submit" id="submitBtn" class="btn btn-primary btn-block">
+        Konto anlegen & starten
+      </button>
+    </form>
+    
+    <div class="auth-footer">
+      <span>🔒 Selbstgehostet & verschlüsselt auf deiner VM</span><br>
+      <span style="font-size: 0.72rem; opacity: 0.7;">⚠️ 100% KI-generierter Code (nicht manuell auditiert)</span>
+    </div>
+  </div>
+
+  <script>
+    // Prüfen, ob Setup noch nötig ist
+    fetch('/api/auth/status')
+      .then(r => r.json())
+      .then(data => {
+        if (!data.needsSetup) {
+          // Setup bereits erledigt -> zur Login-Seite
+          window.location.href = '/login';
+        }
+      })
+      .catch(() => {});
+
+    const form = document.getElementById('setupForm');
+    const alertBox = document.getElementById('alertBox');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function showAlert(msg, isError = true) {
+      alertBox.textContent = msg;
+      alertBox.className = 'alert ' + (isError ? 'alert-error' : 'alert-success');
+      alertBox.classList.remove('hidden');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alertBox.classList.add('hidden');
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const confirm = document.getElementById('passwordConfirm').value;
+
+      if (username.length < 3) {
+        showAlert('Der Benutzername muss mindestens 3 Zeichen lang sein.');
+        return;
+      }
+
+      if (password.length < 6) {
+        showAlert('Das Passwort muss mindestens 6 Zeichen lang sein.');
+        return;
+      }
+
+      if (password !== confirm) {
+        showAlert('Die eingegebenen Passwörter stimmen nicht überein.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Wird eingerichtet...';
+
+      try {
+        const res = await fetch('/api/auth/setup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Fehler beim Setup');
+        }
+
+        showAlert('Erfolgreich eingerichtet! Du wirst weitergeleitet...', false);
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
+
+      } catch (err) {
+        showAlert(err.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Konto anlegen & starten';
+      }
+    });
+  </script>
+</body>
+</html>
+

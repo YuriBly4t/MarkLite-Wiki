@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anmelden • MarkLite Wiki</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2'><path d='M12 20h9'/><path d='M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z'/></svg>">
+</head>
+<body class="auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"/>
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+      </div>
+      <h2>Willkommen zurück</h2>
+      <p class="auth-sub">Melde dich an, um auf deine Notizen zuzugreifen.</p>
+    </div>
+
+    <div id="alertBox" class="alert hidden"></div>
+
+    <form id="loginForm" class="auth-form">
+      <div class="form-group">
+        <label for="username">Benutzername</label>
+        <input type="text" id="username" name="username" placeholder="Dein Benutzername" required autofocus autocomplete="username">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Passwort</label>
+        <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+
+      <button type="submit" id="submitBtn" class="btn btn-primary btn-block">
+        Anmelden
+      </button>
+    </form>
+    
+    <div class="auth-footer">
+      <span>🔒 Selbstgehostetes Markdown-Wiki</span><br>
+      <span style="font-size: 0.72rem; opacity: 0.7;">⚠️ 100% KI-generierter Code (nicht manuell auditiert)</span>
+    </div>
+  </div>
+
+  <script>
+    // Prüfen, ob Setup noch nötig oder ob bereits angemeldet
+    fetch('/api/auth/status')
+      .then(r => r.json())
+      .then(data => {
+        if (data.needsSetup) {
+          window.location.href = '/setup';
+        } else if (data.isAuthenticated) {
+          window.location.href = '/';
+        }
+      })
+      .catch(() => {});
+
+    const form = document.getElementById('loginForm');
+    const alertBox = document.getElementById('alertBox');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function showAlert(msg, isError = true) {
+      alertBox.textContent = msg;
+      alertBox.className = 'alert ' + (isError ? 'alert-error' : 'alert-success');
+      alertBox.classList.remove('hidden');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alertBox.classList.add('hidden');
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Anmeldung läuft...';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Anmeldung fehlgeschlagen');
+        }
+
+        showAlert('Erfolgreich angemeldet!', false);
+        window.location.href = '/';
+
+      } catch (err) {
+        showAlert(err.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Anmelden';
+      }
+    });
+  </script>
+</body>
+</html>
+

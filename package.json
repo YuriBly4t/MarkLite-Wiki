@@ -1,0 +1,33 @@
+{
+  "name": "marklite-wiki",
+  "version": "1.0.0",
+  "description": "Minimalistische, selbstgehostete Markdown-Wiki & Notizen WebApp mit Bildverwaltung und Authentifizierung.",
+  "main": "src/server/index.js",
+  "keywords": [
+    "markdown",
+    "wiki",
+    "notes",
+    "self-hosted",
+    "casaos",
+    "docker",
+    "minimalist",
+    "sqlite"
+  ],
+  "author": "KI-generiert (Gemini / Antigravity)",
+  "license": "MIT",
+  "scripts": {
+    "start": "node src/server/index.js",
+    "dev": "node --watch src/server/index.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.8.1",
+    "cookie-session": "^2.1.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "multer": "^1.4.5-lts.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
