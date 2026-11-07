@@ -1,7 +1,7 @@
 {
   "name": "marklite-wiki",
   "version": "1.0.0",
-  "description": "Minimalistische, selbstgehostete Markdown-Wiki & Notizen WebApp mit Bildverwaltung und Authentifizierung.",
+  "description": "A minimalist, self-hosted Markdown wiki and note-taking web application with image management and authentication.",
   "main": "src/server/index.js",
   "keywords": [
     "markdown",
@@ -13,7 +13,7 @@
     "minimalist",
     "sqlite"
   ],
-  "author": "KI-generiert (Gemini / Antigravity)",
+  "author": "AI-generated (Gemini / Antigravity)",
   "license": "MIT",
   "scripts": {
     "start": "node src/server/index.js",

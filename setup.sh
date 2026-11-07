@@ -1,25 +1,25 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# WikiAlternative - Setup & Initialisierungs-Skript
-# Für ZorinOS (Lokaler Test) und CasaOS / Debian VM
+# MarkLite Wiki - Setup & Initialization Script
+# For Linux (ZorinOS, Ubuntu, Debian) and CasaOS / Docker
 # ==============================================================================
 
 set -e
 
 echo "=========================================================="
-echo "   🚀 Initialisierung: WikiAlternative Setup"
+echo "   🚀 Initializing: MarkLite Wiki Setup"
 echo "=========================================================="
 
-# 1. Verzeichnis prüfen
+# 1. Resolve directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-# 2. Datenverzeichnisse anlegen
-echo "[1/4] Erstelle Datenordner (data/ und data/uploads)..."
+# 2. Create data directories
+echo "[1/4] Creating data directories (data/ and data/uploads)..."
 mkdir -p data/uploads
 
-# 3. Zufälliges Session-Secret generieren
-echo "[2/4] Generiere kryptografisch sicheres Session-Secret..."
+# 3. Generate random session secret
+echo "[2/4] Generating cryptographically secure session secret..."
 
 if command -v openssl >/dev/null 2>&1; then
     RANDOM_SECRET=$(openssl rand -hex 32)
@@ -28,59 +28,56 @@ elif command -v node >/dev/null 2>&1; then
 elif command -v python3 >/dev/null 2>&1; then
     RANDOM_SECRET=$(python3 -c "import secrets; print(secrets.token_hex(32))")
 else
-    # Fallback mit urandom
     RANDOM_SECRET=$(head -c 32 /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 64)
 fi
 
-# 4. .env Datei erstellen oder aktualisieren
+# 4. Create or update .env file
 ENV_FILE=".env"
 if [ -f "$ENV_FILE" ]; then
-    echo "[3/4] Eine .env Datei existiert bereits."
-    # Prüfen ob SESSION_SECRET schon gesetzt ist
-    if grep -q "SESSION_SECRET=" "$ENV_FILE" && ! grep -q "SESSION_SECRET=hier_geheimes_secret_eintragen" "$ENV_FILE"; then
-        echo "      Bestehendes SESSION_SECRET wird beibehalten."
+    echo "[3/4] An existing .env file was found."
+    if grep -q "SESSION_SECRET=" "$ENV_FILE" && ! grep -q "SESSION_SECRET=hier_geheimes_secret_eintragen" "$ENV_FILE" && ! grep -q "SESSION_SECRET=change_this_secret" "$ENV_FILE"; then
+        echo "      Existing SESSION_SECRET retained."
     else
-        echo "      Ersetze Platzhalter durch neues Zufalls-Secret..."
+        echo "      Replacing placeholder with new random secret..."
         sed -i "s/SESSION_SECRET=.*/SESSION_SECRET=${RANDOM_SECRET}/" "$ENV_FILE"
     fi
 else
-    echo "[3/4] Erstelle neue .env Datei aus Vorlage..."
+    echo "[3/4] Generating new .env file from template..."
     cat <<EOF > "$ENV_FILE"
-# Server Konfiguration
+# Server Configuration
 PORT=3000
 NODE_ENV=production
 
-# Kryptografisch generiertes Sitzungs-Geheimnis
+# Cryptographically generated session secret
 SESSION_SECRET=${RANDOM_SECRET}
 
-# Maximale Bild-Uploadgröße in Megabyte
+# Maximum image upload size in megabytes
 MAX_UPLOAD_SIZE_MB=25
 EOF
-    echo "      .env erfolgreich mit zufälligem 64-Zeichen-Secret generiert!"
+    echo "      .env created successfully with a 64-character random secret!"
 fi
 
-# 5. Abschluss & Start-Hinweise
-echo "[4/4] Berechtigungen setzen..."
+# 5. Permissions & finish
+echo "[4/4] Setting folder permissions..."
 chmod -R 755 data 2>/dev/null || true
 
 echo "=========================================================="
-echo "   ✅ Setup erfolgreich vorbereitet!"
+echo "   ✅ Setup completed successfully!"
 echo "=========================================================="
 echo ""
-echo "▶️  Nächste Schritte:"
+echo "▶️  Next steps:"
 echo ""
-echo "Option A: Starten mit Docker / CasaOS (Empfohlen):"
+echo "Option A: Start with Docker / CasaOS (Recommended):"
 echo "   docker compose up -d"
 echo ""
-echo "Option B: Lokaler Test auf ZorinOS ohne Docker:"
+echo "Option B: Local testing without Docker:"
 echo "   npm install"
 echo "   npm start"
 echo ""
-echo "🌐 Danach im Browser aufrufen:"
-echo "   http://localhost:3000 (auf ZorinOS)"
-echo "   oder http://<DEBIAN-VM-IP>:3000 (im CasaOS-Netzwerk)"
+echo "🌐 Then open in your browser:"
+echo "   http://localhost:3000"
+echo "   or http://<SERVER-IP>:3000"
 echo ""
-echo "Beim ersten Aufruf erscheint automatisch der Setup-Dialog"
-echo "zur Erstellung deines Administrator-Accounts."
+echo "On your first visit, the setup wizard will open"
+echo "to help you create your administrator account."
 echo "=========================================================="
-

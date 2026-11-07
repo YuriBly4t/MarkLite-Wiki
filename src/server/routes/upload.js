@@ -8,13 +8,13 @@ const requireAuth = require('../middleware/auth');
 
 const router = express.Router();
 
-// Upload-Verzeichnis
+// Upload directory
 const uploadsDir = path.resolve(__dirname, '../../../data/uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Multer Speicher-Konfiguration
+// Storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadsDir);
@@ -26,13 +26,13 @@ const storage = multer.diskStorage({
   }
 });
 
-// Nur Bilddateien erlauben
+// File type filter: images only
 const fileFilter = (req, file, cb) => {
   const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml', 'image/bmp'];
   if (allowedMimes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Ungültiger Dateityp. Nur Bilder (PNG, JPG, WebP, GIF, SVG) sind erlaubt.'), false);
+    cb(new Error('Invalid file type. Only images (PNG, JPG, WebP, GIF, SVG, BMP) are allowed.'), false);
   }
 };
 
@@ -46,10 +46,10 @@ const upload = multer({
   }
 });
 
-// Upload-Endpunkt (Drag&Drop oder Paste)
+// Image upload endpoint (Drag & Drop or Clipboard Paste)
 router.post('/', requireAuth, upload.single('image'), (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ error: 'Keine Bilddatei empfangen.' });
+    return res.status(400).json({ error: 'No image file received.' });
   }
 
   try {
@@ -67,22 +67,21 @@ router.post('/', requireAuth, upload.single('image'), (req, res) => {
       originalName: req.file.originalname
     });
   } catch (err) {
-    console.error('Fehler beim Speichern des Datei-Metadatensatzes:', err);
-    res.status(500).json({ error: 'Fehler beim Verarbeiten des Bildes.' });
+    console.error('Error saving attachment metadata:', err);
+    res.status(500).json({ error: 'Failed to process image upload.' });
   }
 });
 
-// Hochgeladenes Bild ausliefern (mit Session-Prüfung)
+// Serve uploaded image file
 router.get('/:filename', requireAuth, (req, res) => {
   const safeFilename = path.basename(req.params.filename);
   const filePath = path.join(uploadsDir, safeFilename);
 
   if (!fs.existsSync(filePath)) {
-    return res.status(404).json({ error: 'Bild nicht gefunden.' });
+    return res.status(404).json({ error: 'Image not found.' });
   }
 
   res.sendFile(filePath);
 });
 
 module.exports = router;
-

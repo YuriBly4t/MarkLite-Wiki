@@ -4,156 +4,155 @@
 [![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![SQLite](https://img.shields.io/badge/Database-SQLite-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![AI Generated](https://img.shields.io/badge/Code-100%25%20AI%20Generated-orange)](#-wichtiger-hinweis--disclaimer)
+[![AI Generated](https://img.shields.io/badge/Code-100%25%20AI%20Generated-orange)](#-important-disclaimer-ai-generated-code)
 
-> Eine schlanke, minimalistische und vollständig selbstgehostete Web-Applikation für Notizen und persönliche Dokumentation im Markdown-Format – mit nativer Bildverwaltung, ablenkungsfreiem Design und Benutzer-Authentifizierung.
+> A clean, distraction-free, and fully self-hosted Markdown wiki and personal note-taking web application with native image support, responsive UI, and secure authentication.
 
 ---
 
 > [!WARNING]
-> ### ⚠️ WICHTIGER HINWEIS / DISCLAIMER: KI-GENERIERTER CODE
-> **Dieser Quellcode wurde zu 100 % automatisiert durch Künstliche Intelligenz (KI) generiert und wurde NICHT manuell durch einen menschlichen Softwareentwickler oder IT-Sicherheitsexperten überprüft oder auditiert.**
-> 
-> - Es können unbekannte Sicherheitslücken, Programmierfehler oder funktionale Einschränkungen enthalten sein.
-> - Die Nutzung, Bereitstellung im lokalen Netzwerk oder im Internet erfolgt **vollständig auf eigene Verantwortung und eigenes Risiko**.
-> - Vor einem Einsatz in sicherheitskritischen Umgebungen wird eine manuelle Begutachtung des Codes dringend empfohlen.
+> ### ⚠️ IMPORTANT DISCLAIMER: AI-GENERATED CODE
+> **This entire codebase was generated 100% automatically by Artificial Intelligence (AI) and has NOT been manually audited, reviewed, or verified by a human software developer or cybersecurity expert.**
+>
+> - It may contain unknown vulnerabilities, edge-case bugs, or functional limitations.
+> - Hosting and deploying this application in local networks or on the public internet is done **entirely at your own risk**.
+> - Before using this application in sensitive or production environments, a thorough manual code audit is strongly recommended.
 
 ---
 
-## 🌟 Highlights & Funktionen
+## 🌟 Highlights & Features
 
-- **Ablenkungsfreies Schreiben**: Inspiriert von Bear, Notion und Obsidian. Minimalistisches, schnelles Interface ohne überladene Toolbars.
-- **Markdown Live-Vorschau**:
-  - **Split-View**: Gleichzeitiges Tippen und Lesen auf Desktop/Laptop.
-  - **Reiner Lesemodus**: Perfekt zum Nachschlagen von Dokumentationen.
-  - **Fokus-Schreibmodus**: Maximale Übersicht auf mobilen Geräten.
-- **Bilder nahtlos einfügen**:
-  - **Zwischenablage / Clipboard (`Strg + V`)**: Screenshots direkt in den Editor einfügen.
-  - **Drag & Drop**: Bilddateien einfach in den Editor ziehen.
-  - Automatischer Upload und sofortige Verlinkung im Markdown (`![Bild](/api/uploads/...)`).
-- **Integrierter Setup-Wizard & Login**:
-  - Beim ersten Start führt ein Web-Einrichtungsdialog durch die Erstellung des Administrator-Accounts.
-  - Danach wird der Setup-Endpunkt dauerhaft verriegelt.
-  - Sichere Passwort-Verschlüsselung via `bcryptjs` und abgesicherte `HttpOnly`-Session-Cookies.
-- **Vollständig responsiv**:
-  - Optimiert für PC, Laptop, Tablet und Smartphone (Touch-Drawer-Menü, angepasste Schriftgrößen).
-- **Organisation**:
-  - Schnelle Volltextsuche über Titel und Inhalte.
-  - Dynamisches Tag-System (`#arbeit`, `#linux`, `#ideen`).
-  - Wichtige Notizen anpinnen (📌 Pinned Notes).
+- **Distraction-Free Writing**: Inspired by Bear, iA Writer, and Obsidian. A clean, typography-focused interface without cluttered toolbars.
+- **Markdown with Live Preview**:
+  - **Split View**: Simultaneous editing and live rendering on desktop/laptop.
+  - **Reading Mode**: Clean, presentation-grade viewing for reference and docs.
+  - **Focus Mode**: Fullscreen editor optimized for smartphones and smaller screens.
+- **Seamless Image Management**:
+  - **Clipboard Paste (`Ctrl + V`)**: Paste screenshots directly from your clipboard into the editor.
+  - **Drag & Drop**: Drag image files straight onto the page.
+  - Automatic background upload and instant Markdown referencing (`![Image](/api/uploads/...)`).
+- **First-Run Setup Wizard & Authentication**:
+  - Automatically guides you through creating an administrator account on first visit.
+  - Permanently locks the setup endpoint once an admin exists.
+  - Encrypted passwords via `bcryptjs` and secure `HttpOnly` session cookies.
+- **Fully Responsive**:
+  - Tailored for desktop, laptop, tablet, and mobile (touch-friendly drawer navigation, mobile toolbar).
+- **Organization & Search**:
+  - Instant full-text search across titles and note content.
+  - Dynamic tagging system (`#work`, `#linux`, `#ideas`) with filter pills.
+  - Pin important notes to the top (📌 Pinned Notes).
 - **Dark Mode & Light Mode**:
-  - Automatische Anpassung an das Betriebssystem oder manueller Umschalter.
-- **Zero-Cloud & 100 % Autark**:
-  - Keine externen CDN-Abhängigkeiten zur Laufzeit (funktioniert auch offline oder in isolierten LAN-Umgebungen).
-  - Alle Daten liegen in einer einzigen SQLite-Datei (`data/wiki.db`).
+  - Follows system preference or toggles manually with a single click.
+- **Zero-Cloud & 100% Standalone**:
+  - Zero external CDN dependencies at runtime (runs completely offline and in air-gapped home labs).
+  - All data resides in a single, portable SQLite database file (`data/wiki.db`).
 
 ---
 
-## 🚀 Schnellstart mit Docker (Empfohlen)
+## 🚀 Quickstart with Docker (Recommended)
 
-### 1. Repository klonen
+### 1. Clone the repository
 ```bash
-git clone https://github.com/<DEIN-BENUTZERNAME>/MarkLite-Wiki.git
+git clone https://github.com/YuriBly4t/MarkLite-Wiki.git
 cd MarkLite-Wiki
 ```
 
-### 2. Setup ausführen
-Das mitgelieferte Setup-Skript legt die Datenordner an und generiert automatisch ein kryptografisch sicheres Session-Secret in der `.env`-Datei:
+### 2. Run initial setup
+The included setup script initializes data directories and generates a cryptographically secure 64-character session secret in `.env`:
 ```bash
 ./setup.sh
 ```
 
-### 3. Container starten
+### 3. Start with Docker Compose
 ```bash
 docker compose up -d
 ```
 
-### 4. Öffnen & Einrichten
-Rufe die Anwendung im Browser auf:
-- Lokal: `http://localhost:3000`
-- Im Heimnetzwerk: `http://<SERVER-IP>:3000`
+### 4. Open in browser
+- Local machine: `http://localhost:3000`
+- Network / Server: `http://<SERVER-IP>:3000`
 
-Beim ersten Aufruf erscheint automatisch der **Setup-Dialog** zur Erstellung deines Administrator-Accounts.
-
----
-
-## 🏠 Einsatz auf CasaOS (Debian VM)
-
-MarkLite Wiki ist ideal für CasaOS geeignet, da es keine zusätzlichen Datenbank-Container (wie MySQL oder PostgreSQL) benötigt.
-
-1. **Ordner bereitstellen**: Klone das Repo per SSH oder lade den Ordner über die CasaOS-App *Dateien* hoch.
-2. **Initialisieren**: Führe im Ordner `./setup.sh` aus.
-3. **Starten**: Führe `docker compose up -d` aus oder binde die `docker-compose.yml` in CasaOS als *Custom App* ein.
-4. **Volume-Persistenz**: Alle Daten werden im lokalen Ordner `./data` gemountet und bleiben bei Container-Updates erhalten.
+On your first visit, the **Setup Wizard** will automatically appear to create your admin account.
 
 ---
 
-## 💻 Lokaler Test auf Linux (ZorinOS / Ubuntu / Debian) ohne Docker
+## 🏠 Running on CasaOS (Debian VM)
+
+MarkLite Wiki is lightweight and designed to run effortlessly on CasaOS or any Debian-based server:
+
+1. **Get the files**: Clone via SSH or upload the repository folder into CasaOS via the *Files* app.
+2. **Initialize**: Run `./setup.sh` inside the directory.
+3. **Launch**: Run `docker compose up -d` (or import `docker-compose.yml` via the CasaOS *Custom App* feature).
+4. **Data Persistence**: All your data is stored in the mapped `./data` folder and survives container restarts and upgrades.
+
+---
+
+## 💻 Local Testing on Linux (Ubuntu, Debian, ZorinOS) without Docker
 
 ```bash
-# 1. Setup ausführen
+# 1. Initialize environment
 ./setup.sh
 
-# 2. Abhängigkeiten installieren
+# 2. Install dependencies
 npm install
 
-# 3. Server starten
+# 3. Start the application
 npm start
 ```
 
 ---
 
-## 💾 Backups & Datensicherung
+## 💾 Backups & Data Persistence
 
-Alle Notizen, Passwörter und hochgeladenen Bilder befinden sich gebündelt im Verzeichnis `data/`:
+All user accounts, notes, and uploaded pictures are consolidated inside the `data/` directory:
 
 ```text
 data/
-├── wiki.db          # SQLite Datenbank (Notizen, Tags, Nutzer)
-└── uploads/         # Alle hochgeladenen Bilder
+├── wiki.db          # SQLite database (notes, tags, users)
+└── uploads/         # All uploaded image files
 ```
 
-- **Backup**: Sichere einfach den Ordner `data/` auf ein Backup-Medium oder NAS.
-- **Wiederherstellung**: Kopiere den Ordner `data/` zurück und starte den Container neu (`docker compose restart`).
+- **Backup**: Simply copy the `data/` directory to your backup drive, NAS, or cloud storage.
+- **Restore**: Copy the `data/` directory back in place and restart the container (`docker compose restart`).
 
 ---
 
-## ⚙️ Konfiguration (`.env`)
+## ⚙️ Configuration (`.env`)
 
-| Variable | Beschreibung | Standard |
+| Variable | Description | Default |
 | :--- | :--- | :--- |
-| `PORT` | Webserver-Port | `3000` |
-| `SESSION_SECRET` | 64-Zeichen Zufallsschlüssel für Session-Cookies | *(wird von setup.sh generiert)* |
-| `MAX_UPLOAD_SIZE_MB` | Maximale Dateigröße für Bild-Uploads in MB | `25` |
-| `NODE_ENV` | Umgebung | `production` |
+| `PORT` | Web server listening port | `3000` |
+| `SESSION_SECRET` | 64-character random key for signing cookies | *(generated by setup.sh)* |
+| `MAX_UPLOAD_SIZE_MB` | Maximum image upload size in MB | `25` |
+| `NODE_ENV` | Environment mode | `production` |
 
 ---
 
-## 📁 Projektstruktur
+## 📁 Project Structure
 
 ```text
-├── data/                      # Persistente Daten (SQLite & Uploads)
+├── data/                      # Persistent storage (SQLite & uploads)
 ├── src/
-│   ├── server/               # Express Backend
-│   │   ├── routes/           # REST-API (Auth, Notes, Upload)
-│   │   ├── middleware/       # Authentifizierungsschutz
-│   │   ├── db.js             # SQLite Initialisierung & Queries
-│   │   └── index.js          # Server-Einstiegspunkt
+│   ├── server/               # Express backend
+│   │   ├── routes/           # REST API routes (Auth, Notes, Upload)
+│   │   ├── middleware/       # Authentication guards
+│   │   ├── db.js             # SQLite initialization & queries
+│   │   └── index.js          # Server entry point
 │   └── public/               # Frontend (SPA)
-│       ├── css/style.css     # Responsive Styling & Themes
-│       ├── js/app.js         # App-Logik, Autosave, Drag & Drop
-│       ├── js/markdown.js    # Autarker Markdown-Parser
-│       ├── index.html        # Hauptoberfläche
-│       ├── login.html        # Login-Maske
-│       └── setup.html        # Ersteinrichtungs-Wizard
-├── Dockerfile                # Multi-Arch Docker-Build
-├── docker-compose.yml        # Compose-Konfiguration
-├── setup.sh                  # Setup- & Secret-Generierungs-Skript
-└── LICENSE                   # MIT Lizenz & AI Disclaimer
+│       ├── css/style.css     # Responsive design & themes
+│       ├── js/app.js         # Client application logic, autosave, drag & drop
+│       ├── js/markdown.js    # Standalone Markdown parser
+│       ├── index.html        # Main app UI
+│       ├── login.html        # Login view
+│       └── setup.html        # First-run setup wizard
+├── Dockerfile                # Multi-stage container build
+├── docker-compose.yml        # Docker Compose configuration
+├── setup.sh                  # Setup & secret generation script
+└── LICENSE                   # MIT License with AI disclaimer
 ```
 
 ---
 
-## 📄 Lizenz
+## 📄 License
 
-Dieses Projekt ist unter der **MIT-Lizenz** lizenziert – siehe die [LICENSE](LICENSE) Datei für Details.
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.

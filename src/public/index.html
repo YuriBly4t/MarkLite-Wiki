@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MarkLite Wiki • Minimalistisches Notiz-Wiki</title>
+  <title>MarkLite Wiki • Minimalist Notes Wiki</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2'><path d='M12 20h9'/><path d='M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z'/></svg>">
 </head>
 <body>
   <div class="app-container">
-    <!-- Mobiler Backdrop für Drawer-Menü -->
+    <!-- Mobile drawer backdrop -->
     <div id="drawerBackdrop" class="drawer-backdrop"></div>
 
-    <!-- Linke Seitenleiste -->
+    <!-- Left Sidebar -->
     <aside id="sidebar" class="sidebar">
       <div class="sidebar-header">
         <div class="brand">
@@ -22,7 +22,7 @@
           </svg>
           <span>MarkLite Wiki</span>
         </div>
-        <button id="closeSidebarBtn" class="btn btn-ghost btn-icon mobile-menu-btn" title="Schließen">
+        <button id="closeSidebarBtn" class="btn btn-ghost btn-icon mobile-menu-btn" title="Close">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"/>
             <line x1="6" y1="6" x2="18" y2="18"/>
@@ -30,33 +30,33 @@
         </button>
       </div>
 
-      <!-- Suche & Tags -->
+      <!-- Search & Tags -->
       <div class="sidebar-search-box">
-        <input type="search" id="searchInput" placeholder="🔍 Notizen durchsuchen...">
+        <input type="search" id="searchInput" placeholder="🔍 Search notes...">
         <div id="tagPillsContainer" class="tag-pills">
-          <!-- Dynamische Tags werden hier gerendert -->
+          <!-- Tags rendered dynamically -->
         </div>
       </div>
 
-      <!-- Notizenliste -->
+      <!-- Notes list -->
       <div id="notesListContainer" class="sidebar-notes-list">
-        <!-- Dynamische Notizen -->
+        <!-- Notes rendered dynamically -->
       </div>
 
-      <!-- Seitenleisten-Fußbereich -->
+      <!-- Sidebar footer -->
       <div class="sidebar-footer">
         <div class="user-info">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
             <circle cx="12" cy="7" r="4"/>
           </svg>
-          <span id="userNameDisplay">Benutzer</span>
+          <span id="userNameDisplay">User</span>
         </div>
         <div style="display: flex; gap: 0.25rem;">
-          <button id="themeToggleBtn" class="btn btn-ghost btn-icon" title="Design umschalten">
-            <!-- Icon wird per JS gesetzt -->
+          <button id="themeToggleBtn" class="btn btn-ghost btn-icon" title="Toggle Theme">
+            <!-- Icon set via JS -->
           </button>
-          <button id="logoutBtn" class="btn btn-ghost btn-icon" title="Abmelden">
+          <button id="logoutBtn" class="btn btn-ghost btn-icon" title="Sign Out">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
               <polyline points="16 17 21 12 16 7"/>
@@ -67,12 +67,12 @@
       </div>
     </aside>
 
-    <!-- Hauptbereich -->
+    <!-- Main Content Area -->
     <main class="main-content">
-      <!-- Obere Leiste -->
+      <!-- Top Action Bar -->
       <div class="top-bar">
         <div class="top-bar-left">
-          <button id="mobileMenuBtn" class="btn btn-secondary btn-icon mobile-menu-btn" title="Menü öffnen">
+          <button id="mobileMenuBtn" class="btn btn-secondary btn-icon mobile-menu-btn" title="Open Menu">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="3" y1="12" x2="21" y2="12"/>
               <line x1="3" y1="6" x2="21" y2="6"/>
@@ -85,17 +85,17 @@
               <line x1="12" y1="5" x2="12" y2="19"/>
               <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
-            <span>Neue Notiz</span>
+            <span>New Note</span>
           </button>
 
-          <button id="pinNoteBtn" class="btn btn-ghost btn-icon btn-sm" title="Notiz anpinnen">
+          <button id="pinNoteBtn" class="btn btn-ghost btn-icon btn-sm" title="Pin note">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="12" y1="17" x2="12" y2="22"/>
               <path d="M5 17h14v-2l-2-3V5a1 1 0 0 0-1-1h-8a1 1 0 0 0-1 1v7l-2 3v2z"/>
             </svg>
           </button>
 
-          <button id="deleteNoteBtn" class="btn btn-danger-ghost btn-icon btn-sm" title="Notiz löschen">
+          <button id="deleteNoteBtn" class="btn btn-danger-ghost btn-icon btn-sm" title="Delete note">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="3 6 5 6 21 6"/>
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -104,41 +104,41 @@
         </div>
 
         <div class="top-bar-right">
-          <!-- Umschalter: Schreiben, Split-View, Vorschau -->
+          <!-- View mode switchers: Write, Split, Preview -->
           <div class="mode-toggle-group">
-            <button id="modeEditBtn" class="mode-toggle-btn" title="Nur Editor">Schreiben</button>
-            <button id="modeSplitBtn" class="mode-toggle-btn active" title="Live-Vorschau">Split</button>
-            <button id="modePreviewBtn" class="mode-toggle-btn" title="Reine Lesevorschau">Lesen</button>
+            <button id="modeEditBtn" class="mode-toggle-btn" title="Editor Only">Write</button>
+            <button id="modeSplitBtn" class="mode-toggle-btn active" title="Live Split View">Split</button>
+            <button id="modePreviewBtn" class="mode-toggle-btn" title="Reading View">Preview</button>
           </div>
         </div>
       </div>
 
-      <!-- Editor-Toolbar (Schnelltasten) -->
+      <!-- Editor Toolbar -->
       <div class="editor-toolbar">
-        <button class="toolbar-btn" data-format="h1" title="Überschrift 1"><b>H1</b></button>
-        <button class="toolbar-btn" data-format="h2" title="Überschrift 2"><b>H2</b></button>
-        <button class="toolbar-btn" data-format="h3" title="Überschrift 3"><b>H3</b></button>
+        <button class="toolbar-btn" data-format="h1" title="Heading 1"><b>H1</b></button>
+        <button class="toolbar-btn" data-format="h2" title="Heading 2"><b>H2</b></button>
+        <button class="toolbar-btn" data-format="h3" title="Heading 3"><b>H3</b></button>
         <div class="toolbar-divider"></div>
-        <button class="toolbar-btn" data-format="bold" title="Fett (Strg+B)"><b>B</b></button>
-        <button class="toolbar-btn" data-format="italic" title="Kursiv (Strg+I)"><i>I</i></button>
+        <button class="toolbar-btn" data-format="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+        <button class="toolbar-btn" data-format="italic" title="Italic (Ctrl+I)"><i>I</i></button>
         <div class="toolbar-divider"></div>
-        <button class="toolbar-btn" data-format="list" title="Aufzählung">• Liste</button>
-        <button class="toolbar-btn" data-format="task" title="Checkliste">☑ Checkbox</button>
-        <button class="toolbar-btn" data-format="code" title="Codeblock">&lt;/&gt;</button>
-        <button class="toolbar-btn" data-format="link" title="Link einfügen">🔗 Link</button>
+        <button class="toolbar-btn" data-format="list" title="Bullet List">• List</button>
+        <button class="toolbar-btn" data-format="task" title="Checklist">☑ Task</button>
+        <button class="toolbar-btn" data-format="code" title="Code Block">&lt;/&gt;</button>
+        <button class="toolbar-btn" data-format="link" title="Insert Link">🔗 Link</button>
         <div class="toolbar-divider"></div>
-        <button class="toolbar-btn" data-format="image" title="Bild hochladen & einfügen">🖼️ Bild</button>
-        <!-- Verstecktes Input-Feld für den Bild-Dialog -->
+        <button class="toolbar-btn" data-format="image" title="Upload & Insert Image">🖼️ Image</button>
+        <!-- Hidden input for file selection -->
         <input type="file" id="imageFileInput" accept="image/*" style="display: none;">
       </div>
 
-      <!-- Notiz-Kopf: Titel und Tags -->
+      <!-- Note Header: Title & Tags -->
       <div class="note-header-inputs">
-        <input type="text" id="noteTitleInput" class="note-title-input" placeholder="Titel der Notiz...">
-        <input type="text" id="noteTagsInput" class="note-tags-input" placeholder="Tags mit # eingeben (z. B. #arbeit #idee #linux)">
+        <input type="text" id="noteTitleInput" class="note-title-input" placeholder="Note title...">
+        <input type="text" id="noteTagsInput" class="note-tags-input" placeholder="Tags with # (e.g. #work #ideas #linux)">
       </div>
 
-      <!-- Arbeitsbereich (Editor & Vorschau) -->
+      <!-- Workspace (Editor & Live Preview) -->
       <div id="editorWorkspace" class="editor-workspace view-split">
         <!-- Drag & Drop Overlay -->
         <div id="dropOverlay" class="drop-overlay">
@@ -147,30 +147,30 @@
             <polyline points="17 8 12 3 7 8"/>
             <line x1="12" y1="3" x2="12" y2="15"/>
           </svg>
-          <span>Bild hier loslassen zum Einfügen</span>
+          <span>Drop image here to insert</span>
         </div>
 
-        <!-- Editor-Spalte -->
+        <!-- Editor Column -->
         <div class="pane editor-pane">
-          <textarea id="markdownTextarea" class="markdown-textarea" placeholder="Schreibe hier dein Markdown... (Bilder einfach per Drag & Drop oder Strg+V einfügen)"></textarea>
+          <textarea id="markdownTextarea" class="markdown-textarea" placeholder="Write your Markdown here... (Paste screenshots with Ctrl+V or drag & drop images)"></textarea>
         </div>
 
-        <!-- Vorschau-Spalte -->
+        <!-- Preview Column -->
         <div class="pane preview-pane">
           <div id="markdownPreview" class="markdown-body">
-            <!-- Gerendertes Markdown erscheint hier -->
+            <!-- Rendered markdown appears here -->
           </div>
         </div>
       </div>
 
-      <!-- Status-Leiste -->
+      <!-- Status Bar -->
       <div class="status-bar">
         <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <span id="saveStatus">Bereit</span>
+          <span id="saveStatus">Ready</span>
           <span style="opacity: 0.5;">•</span>
-          <span style="font-size: 0.7rem; opacity: 0.7;" title="Dieser Code wurde durch KI generiert und ist nicht manuell geprüft.">⚠️ KI-generiert (ungeprüft)</span>
+          <span style="font-size: 0.7rem; opacity: 0.7;" title="This code was generated by AI and has not been manually audited.">⚠️ AI-generated (unaudited)</span>
         </div>
-        <span id="wordCount">0 Wörter</span>
+        <span id="wordCount">0 words</span>
       </div>
     </main>
   </div>
@@ -180,4 +180,3 @@
   <script src="/js/app.js"></script>
 </body>
 </html>
-

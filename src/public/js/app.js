@@ -1,8 +1,8 @@
 /**
- * WikiAlternative - Client-Side Applikationslogik
+ * MarkLite Wiki - Client Application Logic
  */
 
-// Globaler Zustand
+// Global State
 const state = {
   user: null,
   notes: [],
@@ -14,7 +14,7 @@ const state = {
   isSaving: false
 };
 
-// DOM-Elemente
+// DOM Elements
 const elements = {
   // Navigation & Drawer
   sidebar: document.getElementById('sidebar'),
@@ -25,13 +25,13 @@ const elements = {
   logoutBtn: document.getElementById('logoutBtn'),
   userNameDisplay: document.getElementById('userNameDisplay'),
 
-  // Listen & Suche
+  // Lists & Search
   searchInput: document.getElementById('searchInput'),
   tagPillsContainer: document.getElementById('tagPillsContainer'),
   notesListContainer: document.getElementById('notesListContainer'),
   newNoteBtn: document.getElementById('newNoteBtn'),
 
-  // Editor-Bereich
+  // Editor Area
   editorWorkspace: document.getElementById('editorWorkspace'),
   noteTitleInput: document.getElementById('noteTitleInput'),
   noteTagsInput: document.getElementById('noteTagsInput'),
@@ -40,20 +40,20 @@ const elements = {
   dropOverlay: document.getElementById('dropOverlay'),
   imageFileInput: document.getElementById('imageFileInput'),
 
-  // Aktionen & Status
+  // Actions & Status
   saveStatus: document.getElementById('saveStatus'),
   wordCount: document.getElementById('wordCount'),
   pinNoteBtn: document.getElementById('pinNoteBtn'),
   deleteNoteBtn: document.getElementById('deleteNoteBtn'),
 
-  // Ansichts-Umschalter
+  // View Switchers
   modeEditBtn: document.getElementById('modeEditBtn'),
   modeSplitBtn: document.getElementById('modeSplitBtn'),
   modePreviewBtn: document.getElementById('modePreviewBtn')
 };
 
 // ==============================================================================
-// 1. Initialisierung & Authentifizierung
+// 1. Initialization & Authentication
 // ==============================================================================
 async function initApp() {
   initTheme();
@@ -81,7 +81,7 @@ async function initApp() {
     await loadTags();
     await loadNotes();
 
-    // Ansichtsmodus für kleine Bildschirme initialisieren
+    // Auto view mode for smaller viewports
     if (window.innerWidth <= 868) {
       setViewMode('edit');
     } else {
@@ -89,12 +89,12 @@ async function initApp() {
     }
 
   } catch (err) {
-    console.error('Initialisierungsfehler:', err);
+    console.error('Initialization error:', err);
   }
 }
 
 // ==============================================================================
-// 2. Theme-Verwaltung (Dark / Light Mode)
+// 2. Theme Management (Dark / Light Mode)
 // ==============================================================================
 function initTheme() {
   const savedTheme = localStorage.getItem('wiki_theme');
@@ -120,7 +120,7 @@ function updateThemeIcon(theme) {
 }
 
 // ==============================================================================
-// 3. Notizen-Verwaltung (Laden, Erstellen, Filtern)
+// 3. Note Management (Load, Create, Filter)
 // ==============================================================================
 async function loadNotes(autoSelectFirst = true) {
   try {
@@ -129,24 +129,23 @@ async function loadNotes(autoSelectFirst = true) {
     if (state.activeTag) url += `tag=${encodeURIComponent(state.activeTag)}&`;
 
     const res = await fetch(url);
-    if (!res.ok) throw new Error('Fehler beim Laden der Notizen');
+    if (!res.ok) throw new Error('Failed to load notes');
 
     state.notes = await res.json();
     renderNotesList();
 
     if (state.notes.length === 0) {
       if (!state.searchQuery && !state.activeTag) {
-        // Erste Willkommens-Notiz anlegen
+        // Create initial welcome note
         await createNewNote(
-          'Willkommen bei WikiAlternative 🚀',
-          '# Hallo!\n\nDies ist deine erste Notiz in deinem persönlichen Markdown-Wiki.\n\n### Wichtigste Funktionen:\n- **Markdown-Formatierung**: Überschriften, Listen, Tabellen und Codeblöcke.\n- **Bilder einfügen**: Einfach einen Screenshot mit `Strg + V` einfügen oder ein Bild hineinziehen (Drag & Drop)!\n- **Checklisten**:\n  - [x] WebApp aufsetzen\n  - [ ] Erste Notiz schreiben\n  - [ ] Bild einfügen\n\nSchreibe einfach los!',
-          ['willkommen', 'tutorial']
+          'Welcome to MarkLite Wiki 🚀',
+          '# Hello!\n\nWelcome to your personal minimalist Markdown wiki.\n\n### Key Features:\n- **Markdown Formatting**: Headings, lists, tables, checklists, and code blocks.\n- **Insert Images**: Simply paste a screenshot using `Ctrl + V` or drag & drop an image into the editor!\n- **Checklists**:\n  - [x] Set up web app\n  - [ ] Write first note\n  - [ ] Insert an image\n\nStart writing right away!',
+          ['welcome', 'guide']
         );
       } else {
         clearEditor();
       }
     } else if (autoSelectFirst) {
-      // Wenn aktuelle Notiz noch in der Liste ist, beibehalten, sonst erste wählen
       const exists = state.notes.find(n => n.id === state.activeNoteId);
       if (exists) {
         selectNote(exists.id);
@@ -174,10 +173,10 @@ function renderTags(tags) {
   if (!elements.tagPillsContainer) return;
   elements.tagPillsContainer.innerHTML = '';
 
-  // "Alle"-Pill
+  // "All" tag pill
   const allPill = document.createElement('span');
   allPill.className = `tag-pill ${!state.activeTag ? 'active' : ''}`;
-  allPill.textContent = 'Alle';
+  allPill.textContent = 'All';
   allPill.addEventListener('click', () => {
     state.activeTag = null;
     loadNotes();
@@ -205,7 +204,7 @@ function renderNotesList() {
   if (state.notes.length === 0) {
     elements.notesListContainer.innerHTML = `
       <div style="padding: 2rem 1rem; text-align: center; color: var(--text-dim); font-size: 0.9rem;">
-        Keine Notizen gefunden
+        No notes found
       </div>
     `;
     return;
@@ -222,14 +221,14 @@ function renderNotesList() {
     const titleEl = document.createElement('div');
     titleEl.className = 'note-item-title';
     if (note.is_pinned) {
-      titleEl.innerHTML = `<span title="Angepinnt">📌</span> ${escapeHtml(note.title)}`;
+      titleEl.innerHTML = `<span title="Pinned">📌</span> ${escapeHtml(note.title)}`;
     } else {
       titleEl.textContent = note.title;
     }
 
     const previewEl = document.createElement('div');
     previewEl.className = 'note-item-preview';
-    previewEl.textContent = note.preview || 'Keine Vorschau verfügbar';
+    previewEl.textContent = note.preview || 'No preview available';
 
     const metaEl = document.createElement('div');
     metaEl.className = 'note-item-meta';
@@ -255,7 +254,7 @@ async function selectNote(noteId) {
 
   try {
     const res = await fetch(`/api/notes/${noteId}`);
-    if (!res.ok) throw new Error('Notiz konnte nicht geladen werden');
+    if (!res.ok) throw new Error('Failed to load note');
 
     const note = await res.json();
     elements.noteTitleInput.value = note.title || '';
@@ -265,7 +264,7 @@ async function selectNote(noteId) {
     updatePinButtonState(note.is_pinned);
     updatePreview();
     updateWordCount();
-    setSaveStatus('Gespeichert');
+    setSaveStatus('Saved');
 
   } catch (err) {
     console.error(err);
@@ -278,13 +277,13 @@ async function createNewNote(customTitle, customContent, customTags) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        title: customTitle || 'Neue Notiz',
+        title: customTitle || 'New Note',
         content: customContent || '',
         tags: customTags || []
       })
     });
 
-    if (!res.ok) throw new Error('Fehler beim Anlegen');
+    if (!res.ok) throw new Error('Failed to create note');
     const newNote = await res.json();
 
     await loadTags();
@@ -292,7 +291,6 @@ async function createNewNote(customTitle, customContent, customTags) {
     selectNote(newNote.id);
     closeMobileSidebar();
 
-    // Fokus auf Editor setzen
     if (!customTitle) {
       elements.noteTitleInput.focus();
       elements.noteTitleInput.select();
@@ -306,9 +304,9 @@ async function deleteActiveNote() {
   if (!state.activeNoteId) return;
 
   const current = state.notes.find(n => n.id === state.activeNoteId);
-  const title = current ? current.title : 'diese Notiz';
+  const title = current ? current.title : 'this note';
 
-  if (!confirm(`Möchtest du "${title}" wirklich löschen?`)) {
+  if (!confirm(`Are you sure you want to delete "${title}"?`)) {
     return;
   }
 
@@ -317,14 +315,14 @@ async function deleteActiveNote() {
       method: 'DELETE'
     });
 
-    if (!res.ok) throw new Error('Fehler beim Löschen');
+    if (!res.ok) throw new Error('Failed to delete note');
 
     state.activeNoteId = null;
     await loadTags();
     await loadNotes(true);
   } catch (err) {
     console.error(err);
-    alert('Fehler beim Löschen der Notiz.');
+    alert('Failed to delete note.');
   }
 }
 
@@ -343,7 +341,7 @@ async function togglePinActiveNote() {
       body: JSON.stringify({ isPinned: newPinState })
     });
 
-    if (!res.ok) throw new Error('Fehler beim Pinnen');
+    if (!res.ok) throw new Error('Failed to pin note');
     const updated = await res.json();
 
     updatePinButtonState(updated.is_pinned);
@@ -358,11 +356,11 @@ function updatePinButtonState(isPinned) {
   if (isPinned) {
     elements.pinNoteBtn.classList.add('btn-primary');
     elements.pinNoteBtn.classList.remove('btn-ghost');
-    elements.pinNoteBtn.title = 'Notiz entpinnen';
+    elements.pinNoteBtn.title = 'Unpin note';
   } else {
     elements.pinNoteBtn.classList.remove('btn-primary');
     elements.pinNoteBtn.classList.add('btn-ghost');
-    elements.pinNoteBtn.title = 'Notiz anpinnen';
+    elements.pinNoteBtn.title = 'Pin note';
   }
 }
 
@@ -370,18 +368,18 @@ function clearEditor() {
   elements.noteTitleInput.value = '';
   elements.noteTagsInput.value = '';
   elements.markdownTextarea.value = '';
-  elements.markdownPreview.innerHTML = '<p style="color: var(--text-dim); text-align: center; margin-top: 3rem;">Keine Notiz ausgewählt</p>';
+  elements.markdownPreview.innerHTML = '<p style="color: var(--text-dim); text-align: center; margin-top: 3rem;">No note selected</p>';
   setSaveStatus('');
-  if (elements.wordCount) elements.wordCount.textContent = '0 Wörter';
+  if (elements.wordCount) elements.wordCount.textContent = '0 words';
 }
 
 // ==============================================================================
-// 4. Autosave & Live-Synchronisierung
+// 4. Autosave & Live Sync
 // ==============================================================================
 function scheduleAutosave() {
   if (!state.activeNoteId) return;
 
-  setSaveStatus('Wird gespeichert...');
+  setSaveStatus('Saving...');
   clearTimeout(state.saveTimeout);
 
   state.saveTimeout = setTimeout(async () => {
@@ -412,10 +410,9 @@ async function saveActiveNote() {
       })
     });
 
-    if (!res.ok) throw new Error('Fehler beim Speichern');
+    if (!res.ok) throw new Error('Failed to save note');
     const updated = await res.json();
 
-    // Titel und Vorschau in der Seitenleiste aktualisieren
     const noteInState = state.notes.find(n => n.id === updated.id);
     if (noteInState) {
       noteInState.title = updated.title;
@@ -425,10 +422,10 @@ async function saveActiveNote() {
       renderNotesList();
     }
 
-    setSaveStatus('Gespeichert');
+    setSaveStatus('Saved');
   } catch (err) {
     console.error(err);
-    setSaveStatus('Fehler beim Speichern!');
+    setSaveStatus('Failed to save!');
   } finally {
     state.isSaving = false;
   }
@@ -445,7 +442,7 @@ function updateWordCount() {
   const text = elements.markdownTextarea.value.trim();
   const words = text ? text.split(/\s+/).length : 0;
   const chars = text.length;
-  elements.wordCount.textContent = `${words} Wörter • ${chars} Zeichen`;
+  elements.wordCount.textContent = `${words} words • ${chars} chars`;
 }
 
 function updatePreview() {
@@ -455,15 +452,15 @@ function updatePreview() {
 }
 
 // ==============================================================================
-// 5. Bild-Upload (Clipboard Paste & Drag & Drop)
+// 5. Image Upload (Clipboard Paste & Drag & Drop)
 // ==============================================================================
 async function uploadImageFile(file) {
   if (!state.activeNoteId) {
-    alert('Bitte wähle zuerst eine Notiz aus.');
+    alert('Please select a note first.');
     return;
   }
 
-  setSaveStatus('Bild wird hochgeladen...');
+  setSaveStatus('Uploading image...');
 
   const formData = new FormData();
   formData.append('image', file);
@@ -477,20 +474,19 @@ async function uploadImageFile(file) {
     const data = await res.json();
 
     if (!res.ok) {
-      throw new Error(data.error || 'Upload fehlgeschlagen');
+      throw new Error(data.error || 'Upload failed');
     }
 
-    // Markdown-Bildcode an der Cursor-Position einfügen
-    insertTextAtCursor(`\n![${data.originalName || 'Bild'}](${data.url})\n`);
+    insertTextAtCursor(`\n![${data.originalName || 'Image'}](${data.url})\n`);
     updatePreview();
     updateWordCount();
     scheduleAutosave();
 
-    setSaveStatus('Bild eingefügt & gespeichert');
+    setSaveStatus('Image inserted & saved');
   } catch (err) {
     console.error(err);
-    alert(err.message || 'Fehler beim Hochladen des Bildes');
-    setSaveStatus('Upload fehlgeschlagen');
+    alert(err.message || 'Failed to upload image');
+    setSaveStatus('Upload failed');
   }
 }
 
@@ -523,7 +519,7 @@ function wrapSelection(before, after) {
 }
 
 // ==============================================================================
-// 6. Ansichtsmodus & Responsive Drawer
+// 6. View Mode & Responsive Drawer
 // ==============================================================================
 function setViewMode(mode) {
   state.viewMode = mode;
@@ -555,7 +551,7 @@ function closeMobileSidebar() {
 }
 
 // ==============================================================================
-// 7. Event-Listener Einrichten
+// 7. Event Listeners Setup
 // ==============================================================================
 function setupEventListeners() {
   // Theme Toggle
@@ -571,12 +567,12 @@ function setupEventListeners() {
     });
   }
 
-  // Neue Notiz
+  // New Note
   if (elements.newNoteBtn) {
     elements.newNoteBtn.addEventListener('click', () => createNewNote());
   }
 
-  // Suche
+  // Search
   if (elements.searchInput) {
     elements.searchInput.addEventListener('input', (e) => {
       state.searchQuery = e.target.value.trim();
@@ -605,16 +601,16 @@ function setupEventListeners() {
     scheduleAutosave();
   });
 
-  // Notiz-Aktionen
+  // Note Actions
   if (elements.pinNoteBtn) elements.pinNoteBtn.addEventListener('click', togglePinActiveNote);
   if (elements.deleteNoteBtn) elements.deleteNoteBtn.addEventListener('click', deleteActiveNote);
 
-  // Ansichtsmodus
+  // View Mode Buttons
   if (elements.modeEditBtn) elements.modeEditBtn.addEventListener('click', () => setViewMode('edit'));
   if (elements.modeSplitBtn) elements.modeSplitBtn.addEventListener('click', () => setViewMode('split'));
   if (elements.modePreviewBtn) elements.modePreviewBtn.addEventListener('click', () => setViewMode('preview'));
 
-  // --- Clipboard Paste (Ctrl+V) für Bilder ---
+  // --- Clipboard Paste (Ctrl+V) for Images ---
   elements.markdownTextarea.addEventListener('paste', (e) => {
     const clipboardData = e.clipboardData || window.clipboardData;
     if (!clipboardData || !clipboardData.items) return;
@@ -632,7 +628,7 @@ function setupEventListeners() {
     }
   });
 
-  // --- Drag & Drop für Bilder ---
+  // --- Drag & Drop for Images ---
   const dropZone = elements.editorWorkspace;
 
   ['dragenter', 'dragover'].forEach(eventName => {
@@ -658,22 +654,22 @@ function setupEventListeners() {
       if (file.type.startsWith('image/')) {
         uploadImageFile(file);
       } else {
-        alert('Nur Bilddateien (PNG, JPG, WebP, GIF, SVG) können eingefügt werden.');
+        alert('Only image files (PNG, JPG, WebP, GIF, SVG, BMP) can be inserted.');
       }
     }
   });
 
-  // Toolbar Image-Button
+  // Toolbar Image Button
   if (elements.imageFileInput) {
     elements.imageFileInput.addEventListener('change', (e) => {
       if (e.target.files && e.target.files[0]) {
         uploadImageFile(e.target.files[0]);
-        e.target.value = ''; // Reset für erneute Auswahl
+        e.target.value = '';
       }
     });
   }
 
-  // Keyboard Shortcuts (Strg+S)
+  // Keyboard Shortcuts (Ctrl+S / Cmd+S)
   window.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 's') {
       e.preventDefault();
@@ -681,7 +677,7 @@ function setupEventListeners() {
     }
   });
 
-  // Toolbar Formatierungs-Buttons
+  // Toolbar Formatting Buttons
   setupToolbarButtons();
 }
 
@@ -708,7 +704,7 @@ function setupToolbarButtons() {
 }
 
 // ==============================================================================
-// 8. Hilfsfunktionen
+// 8. Utility Functions
 // ==============================================================================
 function escapeHtml(str) {
   if (!str) return '';
@@ -724,9 +720,8 @@ function formatDate(dateStr) {
   if (isToday) {
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
-  return d.toLocaleDateString([], { day: '2-digit', month: '2-digit' });
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }
 
-// App starten
+// Start application
 document.addEventListener('DOMContentLoaded', initApp);
-

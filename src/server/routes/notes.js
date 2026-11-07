@@ -4,48 +4,48 @@ const requireAuth = require('../middleware/auth');
 
 const router = express.Router();
 
-// Alle Notizen-Routen erfordern Login
+// All notes endpoints require authentication
 router.use(requireAuth);
 
-// Liste aller Notizen (mit optionaler Suche und Tag-Filter)
+// List all notes (optional search and tag filtering)
 router.get('/', (req, res) => {
   try {
     const { search, tag } = req.query;
     const notes = db.getNotes(req.session.userId, { search, tag });
     res.json(notes);
   } catch (err) {
-    console.error('Fehler beim Laden der Notizen:', err);
-    res.status(500).json({ error: 'Notizen konnten nicht geladen werden.' });
+    console.error('Error loading notes:', err);
+    res.status(500).json({ error: 'Failed to load notes.' });
   }
 });
 
-// Alle Tags des Nutzers
+// All tags for current user
 router.get('/tags', (req, res) => {
   try {
     const tags = db.getAllTags(req.session.userId);
     res.json(tags);
   } catch (err) {
-    console.error('Fehler beim Laden der Tags:', err);
-    res.status(500).json({ error: 'Tags konnten nicht geladen werden.' });
+    console.error('Error loading tags:', err);
+    res.status(500).json({ error: 'Failed to load tags.' });
   }
 });
 
-// Einzelne Notiz laden
+// Get single note by ID
 router.get('/:id', (req, res) => {
   try {
     const noteId = parseInt(req.params.id, 10);
     const note = db.getNoteById(noteId, req.session.userId);
     if (!note) {
-      return res.status(404).json({ error: 'Notiz nicht gefunden.' });
+      return res.status(404).json({ error: 'Note not found.' });
     }
     res.json(note);
   } catch (err) {
-    console.error('Fehler beim Abrufen der Notiz:', err);
-    res.status(500).json({ error: 'Notiz konnte nicht geladen werden.' });
+    console.error('Error retrieving note:', err);
+    res.status(500).json({ error: 'Failed to retrieve note.' });
   }
 });
 
-// Neue Notiz anlegen
+// Create new note
 router.post('/', (req, res) => {
   try {
     const { title, content, isPinned, tags } = req.body;
@@ -57,12 +57,12 @@ router.post('/', (req, res) => {
     });
     res.status(201).json(note);
   } catch (err) {
-    console.error('Fehler beim Erstellen der Notiz:', err);
-    res.status(500).json({ error: 'Notiz konnte nicht gespeichert werden.' });
+    console.error('Error creating note:', err);
+    res.status(500).json({ error: 'Failed to create note.' });
   }
 });
 
-// Notiz aktualisieren
+// Update note
 router.put('/:id', (req, res) => {
   try {
     const noteId = parseInt(req.params.id, 10);
@@ -76,32 +76,31 @@ router.put('/:id', (req, res) => {
     });
 
     if (!updated) {
-      return res.status(404).json({ error: 'Notiz nicht gefunden oder keine Berechtigung.' });
+      return res.status(404).json({ error: 'Note not found or unauthorized.' });
     }
 
     res.json(updated);
   } catch (err) {
-    console.error('Fehler beim Aktualisieren der Notiz:', err);
-    res.status(500).json({ error: 'Notiz konnte nicht aktualisiert werden.' });
+    console.error('Error updating note:', err);
+    res.status(500).json({ error: 'Failed to update note.' });
   }
 });
 
-// Notiz löschen
+// Delete note
 router.delete('/:id', (req, res) => {
   try {
     const noteId = parseInt(req.params.id, 10);
     const success = db.deleteNote(noteId, req.session.userId);
 
     if (!success) {
-      return res.status(404).json({ error: 'Notiz nicht gefunden.' });
+      return res.status(404).json({ error: 'Note not found.' });
     }
 
-    res.json({ success: true, message: 'Notiz gelöscht.' });
+    res.json({ success: true, message: 'Note deleted successfully.' });
   } catch (err) {
-    console.error('Fehler beim Löschen der Notiz:', err);
-    res.status(500).json({ error: 'Notiz konnte nicht gelöscht werden.' });
+    console.error('Error deleting note:', err);
+    res.status(500).json({ error: 'Failed to delete note.' });
   }
 });
 
 module.exports = router;
-

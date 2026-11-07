@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,46 +16,45 @@
           <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
         </svg>
       </div>
-      <h2>Ersteinrichtung</h2>
-      <p class="auth-sub">Willkommen bei deinem persönlichen Markdown-Wiki. Erstelle jetzt dein Administrator-Konto.</p>
+      <h2>Initial Setup</h2>
+      <p class="auth-sub">Welcome to your personal Markdown wiki. Create your administrator account to get started.</p>
     </div>
 
     <div id="alertBox" class="alert hidden"></div>
 
     <form id="setupForm" class="auth-form">
       <div class="form-group">
-        <label for="username">Administrator-Benutzername</label>
-        <input type="text" id="username" name="username" placeholder="z. B. admin" required autofocus autocomplete="username">
+        <label for="username">Administrator Username</label>
+        <input type="text" id="username" name="username" placeholder="e.g. admin" required autofocus autocomplete="username">
       </div>
 
       <div class="form-group">
-        <label for="password">Passwort (min. 6 Zeichen)</label>
+        <label for="password">Password (min. 6 characters)</label>
         <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="new-password">
       </div>
 
       <div class="form-group">
-        <label for="passwordConfirm">Passwort wiederholen</label>
+        <label for="passwordConfirm">Confirm Password</label>
         <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="••••••••" required autocomplete="new-password">
       </div>
 
       <button type="submit" id="submitBtn" class="btn btn-primary btn-block">
-        Konto anlegen & starten
+        Create Account & Get Started
       </button>
     </form>
     
     <div class="auth-footer">
-      <span>🔒 Selbstgehostet & verschlüsselt auf deiner VM</span><br>
-      <span style="font-size: 0.72rem; opacity: 0.7;">⚠️ 100% KI-generierter Code (nicht manuell auditiert)</span>
+      <span>🔒 Self-hosted & encrypted on your server</span><br>
+      <span style="font-size: 0.72rem; opacity: 0.7;">⚠️ 100% AI-generated code (not manually audited)</span>
     </div>
   </div>
 
   <script>
-    // Prüfen, ob Setup noch nötig ist
+    // Check if setup is still required
     fetch('/api/auth/status')
       .then(r => r.json())
       .then(data => {
         if (!data.needsSetup) {
-          // Setup bereits erledigt -> zur Login-Seite
           window.location.href = '/login';
         }
       })
@@ -80,22 +79,22 @@
       const confirm = document.getElementById('passwordConfirm').value;
 
       if (username.length < 3) {
-        showAlert('Der Benutzername muss mindestens 3 Zeichen lang sein.');
+        showAlert('Username must be at least 3 characters long.');
         return;
       }
 
       if (password.length < 6) {
-        showAlert('Das Passwort muss mindestens 6 Zeichen lang sein.');
+        showAlert('Password must be at least 6 characters long.');
         return;
       }
 
       if (password !== confirm) {
-        showAlert('Die eingegebenen Passwörter stimmen nicht überein.');
+        showAlert('Passwords do not match.');
         return;
       }
 
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Wird eingerichtet...';
+      submitBtn.textContent = 'Setting up...';
 
       try {
         const res = await fetch('/api/auth/setup', {
@@ -107,10 +106,10 @@
         const data = await res.json();
 
         if (!res.ok) {
-          throw new Error(data.error || 'Fehler beim Setup');
+          throw new Error(data.error || 'Setup failed');
         }
 
-        showAlert('Erfolgreich eingerichtet! Du wirst weitergeleitet...', false);
+        showAlert('Setup successful! Redirecting...', false);
         setTimeout(() => {
           window.location.href = '/';
         }, 1000);
@@ -118,10 +117,9 @@
       } catch (err) {
         showAlert(err.message);
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Konto anlegen & starten';
+        submitBtn.textContent = 'Create Account & Get Started';
       }
     });
   </script>
 </body>
 </html>
-

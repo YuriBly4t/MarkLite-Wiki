@@ -171,7 +171,7 @@ module.exports = {
   },
 
   createNote(userId, { title, content, isPinned = 0, tags = [] }) {
-    const finalTitle = (title && title.trim()) ? title.trim() : 'Ohne Titel';
+    const finalTitle = (title && title.trim()) ? title.trim() : 'Untitled';
     const stmt = db.prepare(`
       INSERT INTO notes (user_id, title, content, is_pinned, created_at, updated_at)
       VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
@@ -190,7 +190,7 @@ module.exports = {
     const current = this.getNoteById(id, userId);
     if (!current) return null;
 
-    const newTitle = title !== undefined ? ((title && title.trim()) ? title.trim() : 'Ohne Titel') : current.title;
+    const newTitle = title !== undefined ? ((title && title.trim()) ? title.trim() : 'Untitled') : current.title;
     const newContent = content !== undefined ? content : current.content;
     const newPinned = isPinned !== undefined ? (isPinned ? 1 : 0) : current.is_pinned;
 
